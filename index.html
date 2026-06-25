@@ -6,99 +6,110 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>国語</title>
   <style>
-    :root { --line:#e2e8f0; --ink:#1e293b; --muted:#64748b; }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    /* ===== 理科V2 / 算数アプリのトップ画面に合わせた共通スタイル ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
     body {
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-      color: var(--ink); background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-size: 16px; color: #1d1d1f; background: #f5f5f7;
+      -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation; user-select: none; -webkit-user-select: none;
     }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 14px 16px 40px; }
 
-    /* ヘッダー（戻る＋タイトル＋ユーザー） */
-    .top-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .btn-portal {
-      display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;
-      color: #007aff; background: #eaf2ff; border: 1px solid #cfe0ff; border-radius: 999px;
-      padding: 6px 13px; text-decoration: none; white-space: nowrap;
-    }
-    .btn-portal:active { background: #d7e7ff; }
-    .spacer { flex: 1 1 auto; }
-    .user-badge {
-      display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700;
-      color: #be123c; background: #ffe4e6; border: 1px solid #fecdd3; border-radius: 999px; padding: 5px 12px;
-      cursor: pointer; border: none;
-    }
-    .user-badge .switch { font-size: 11px; font-weight: 600; color: #9f1239; opacity: .8; }
+    /* 画面切り替え */
+    .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
+    .screen.active { display: flex; }
 
-    h1.page-title { font-size: 24px; margin: 16px 2px 4px; }
-    p.lead { margin: 0 2px 18px; color: var(--muted); font-size: 13px; }
+    /* ヘッダー */
+    .header {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: #fff; border-bottom: 1px solid #e0e0e0; min-height: 52px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-title { flex: 1; font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-user { font-size: 13px; color: #007aff; font-weight: 600; white-space: nowrap; }
+    .btn-icon { background: none; border: none; font-size: 22px; cursor: pointer; padding: 4px 8px; color: #007aff; }
+    .btn-portal-top {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 600; color: #007aff; background: #eaf2ff;
+      border: 1px solid #cfe0ff; border-radius: 999px; padding: 5px 12px;
+      text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-portal-top:active { background: #d6e6ff; }
 
-    /* ユーザー未選択プロンプト */
-    .user-pick {
-      background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px;
-      margin-bottom: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    /* ユーザー選択画面 */
+    .user-select-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 24px; }
+    .app-title { font-size: 28px; font-weight: 700; }
+    .app-subtitle { font-size: 16px; color: #86868b; }
+    .user-buttons { display: flex; gap: 20px; }
+    .btn-user {
+      width: 120px; height: 120px; border-radius: 24px; border: none; background: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08); font-size: 24px; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .user-pick p { margin: 0 0 12px; font-weight: 700; font-size: 15px; }
-    .user-pick .row { display: flex; gap: 12px; }
-    .user-pick button {
-      flex: 1; font-size: 18px; font-weight: 700; padding: 16px; border-radius: 14px;
-      border: 2px solid #fecdd3; background: #fff1f2; color: #be123c; cursor: pointer;
-    }
-    .user-pick button:active { transform: scale(.96); }
+    .btn-user:active { transform: scale(0.96); box-shadow: 0 1px 6px rgba(0,0,0,0.12); }
 
-    /* 3アプリのカード */
-    .apps { display: grid; gap: 14px; grid-template-columns: 1fr; }
-    @media (min-width: 560px) { .apps { grid-template-columns: 1fr 1fr 1fr; } }
-    .app-card {
-      display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none;
-      background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px 16px;
-      box-shadow: 0 1px 5px rgba(0,0,0,.06); color: var(--ink);
+    /* カテゴリ（＝各国語アプリ）一覧 */
+    .unit-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    .unit-card {
+      background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      cursor: pointer; transition: transform 0.15s; display: flex; align-items: center; gap: 16px;
+      text-decoration: none; color: inherit;
     }
-    .app-card:active { transform: scale(.97); }
-    .app-icon {
-      width: 76px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
-      font-size: 32px; background: #fee2e2;
+    .unit-card:active { transform: scale(0.98); }
+    .unit-card-info { flex: 1; }
+    .unit-card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .unit-card-subtitle { font-size: 13px; color: #86868b; }
+    .unit-card-arrow { font-size: 20px; color: #c7c7cc; }
+
+    @media (min-width: 768px) {
+      .btn-user { width: 150px; height: 150px; font-size: 28px; }
+      .app-title { font-size: 32px; }
     }
-    .app-name { font-size: 16px; font-weight: 800; }
-    .app-desc { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.4; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-bar">
-      <a class="btn-portal" href="https://komaguchi-wq.github.io/study-portal/">🏠 学習ポータルTOPへ</a>
-      <span class="spacer"></span>
-      <button id="userBadge" class="user-badge" style="display:none;" onclick="switchUser()">
-        <span>👤 <span id="userName"></span></span><span class="switch">切替</span>
-      </button>
-    </div>
-
-    <h1 class="page-title">📖 国語</h1>
-    <p class="lead">使うアプリを選んでください。</p>
-
-    <div id="userPick" class="user-pick" style="display:none;">
-      <p>だれが使う？</p>
-      <div class="row">
-        <button onclick="pickUser('さと')">さと</button>
-        <button onclick="pickUser('ぱぱ')">ぱぱ</button>
+  <!-- ユーザー選択画面 -->
+  <div id="screen-user" class="screen">
+    <div class="user-select-body">
+      <h1 class="app-title">📖 国語</h1>
+      <p class="app-subtitle">ユーザーを選んでください</p>
+      <div class="user-buttons">
+        <button class="btn-user" onclick="pickUser('さと')">さと</button>
+        <button class="btn-user" onclick="pickUser('ぱぱ')">ぱぱ</button>
       </div>
     </div>
+  </div>
 
-    <div class="apps">
-      <a class="app-card" href="https://komaguchi-wq.github.io/kokugo-kotobanavi/">
-        <span class="app-icon">📖</span>
-        <span class="app-name">言葉ナビ</span>
-        <span class="app-desc">ことわざ・慣用句・<br>四字熟語</span>
+  <!-- カテゴリ一覧画面（＝国語アプリの選択） -->
+  <div id="screen-categories" class="screen">
+    <header class="header">
+      <a class="btn-portal-top" href="https://komaguchi-wq.github.io/study-portal/">🏠 学習ポータルTOPへ</a>
+      <button class="btn-icon" onclick="switchUser()">👤</button>
+      <h1 class="header-title">📖 国語</h1>
+      <span class="header-user" id="header-user-name"></span>
+    </header>
+    <div class="unit-list">
+      <a class="unit-card" href="https://komaguchi-wq.github.io/kokugo-kotobanavi/">
+        <div class="unit-card-info">
+          <div class="unit-card-title">📖 言葉ナビ</div>
+          <div class="unit-card-subtitle">ことわざ・慣用句・四字熟語</div>
+        </div>
+        <div class="unit-card-arrow">›</div>
       </a>
-      <a class="app-card" href="https://komaguchi-wq.github.io/goi1400-training/">
-        <span class="app-icon">📝</span>
-        <span class="app-name">語彙力1400</span>
-        <span class="app-desc">語彙力トレーニング</span>
+      <a class="unit-card" href="https://komaguchi-wq.github.io/goi1400-training/">
+        <div class="unit-card-info">
+          <div class="unit-card-title">📝 語彙力1400</div>
+          <div class="unit-card-subtitle">語彙力トレーニング</div>
+        </div>
+        <div class="unit-card-arrow">›</div>
       </a>
-      <a class="app-card" href="https://komaguchi-wq.github.io/kokugo-weekly-sapix/">
-        <span class="app-icon">📚</span>
-        <span class="app-name">Weekly SapiX</span>
-        <span class="app-desc">読解（大問別）</span>
+      <a class="unit-card" href="https://komaguchi-wq.github.io/kokugo-weekly-sapix/">
+        <div class="unit-card-info">
+          <div class="unit-card-title">📚 Weekly SapiX</div>
+          <div class="unit-card-subtitle">読解（大問別）</div>
+        </div>
+        <div class="unit-card-arrow">›</div>
       </a>
     </div>
   </div>
@@ -106,22 +117,22 @@
   <script>
     // 全アプリ共通の端末ユーザー記憶（同一オリジン komaguchi-wq.github.io の localStorage を共有）
     var STUDY_USER_KEY = 'study-user';
-    function renderUser() {
-      var u = localStorage.getItem(STUDY_USER_KEY);
-      var badge = document.getElementById('userBadge');
-      var pick = document.getElementById('userPick');
-      if (u === 'さと' || u === 'ぱぱ') {
-        document.getElementById('userName').textContent = u;
-        badge.style.display = '';
-        pick.style.display = 'none';
-      } else {
-        badge.style.display = 'none';
-        pick.style.display = '';
-      }
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+      document.getElementById(id).classList.add('active');
     }
-    function pickUser(u) { localStorage.setItem(STUDY_USER_KEY, u); renderUser(); }
-    function switchUser() { localStorage.removeItem(STUDY_USER_KEY); renderUser(); }
-    renderUser();
+    function applyUser(u) {
+      document.getElementById('header-user-name').textContent = u;
+      showScreen('screen-categories');
+    }
+    function pickUser(u) { try { localStorage.setItem(STUDY_USER_KEY, u); } catch(e) {} applyUser(u); }
+    function switchUser() { try { localStorage.removeItem(STUDY_USER_KEY); } catch(e) {} showScreen('screen-user'); }
+    (function init(){
+      var u = null;
+      try { u = localStorage.getItem(STUDY_USER_KEY); } catch(e) {}
+      if (u === 'さと' || u === 'ぱぱ') applyUser(u);
+      else showScreen('screen-user');
+    })();
   </script>
 </body>
 </html>
